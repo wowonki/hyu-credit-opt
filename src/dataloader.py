@@ -3,7 +3,7 @@ import logging
 from pathlib import Path
 
 import numpy as np
-from cvxopt import matrix
+from cvxopt import matrix, sparse
 
 from src.exceptions import *
 
@@ -55,6 +55,7 @@ class DataLoader():
                             -np.eye(3000, dtype=int), 
                             np.eye(3000, dtype=int)), axis=0)
         A = matrix(A)
+        A = sparse(A) # There are many zero entries in constraint matirx A. In order to savve memory, convert matrix object to sparse matrix
         
         B = matrix([1, -1, constant, matrix(np.zeros((3000,1))), matrix(point2x0)])
         L = matrix(ldata.T)

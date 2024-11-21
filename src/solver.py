@@ -20,9 +20,10 @@ def solve_lp(args: tuple[int, list]|list[int, list],
         used_const.append(j+3)
         used_const.append(j+3003)
     
-    opt = solvers.lp(L, A, B, solver='glpk')
+    opt = solvers.lp(L[used_vars], A[used_const, used_vars], B[used_const], solver='glpk')
     end = time.time()
     
     opt['elapsed'] = end - start
+    opt['prob_num'] = i
     logger.info(f"'solve_lp' RUN COMPLETELY | STATUS: {opt['status']}")
     return i, opt

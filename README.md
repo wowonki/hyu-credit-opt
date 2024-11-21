@@ -12,4 +12,3 @@ load data from 'data/' directory
 ### solver.py
 
 solve linear programming function
-
