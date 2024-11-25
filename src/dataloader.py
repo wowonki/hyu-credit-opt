@@ -61,8 +61,6 @@ class DataLoader():
         L = matrix(ldata.T)
         
         return vars, A, B, L
-        
-        left_coef = np.ones(self.VARNUM)
 
     def _check_paths(self):
         current_dir = self._get_current_dir()
@@ -197,13 +195,13 @@ class DataLoader():
         """
         logger.info("LOADING 'matrix_cp_return.txt' ...")
         
-        if self._matrix_cpmean is None:
+        if self._matrix_cpreturn is None:
             data = self.read_txtfile(self.matrix_cp_return_path)
             data = data[1]
-            self._matrix_cpmean = [float(d) for d in data]
+            self._matrix_cpreturn = [float(d) for d in data]
             
         logger.info("'matrix_cp_return.txt' IS LOADED")
-        return self._matrix_cpmean
+        return self._matrix_cpreturn
         
     def get_point_2x0(self) -> list[float]: 
         """

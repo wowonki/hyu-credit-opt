@@ -1,5 +1,3 @@
-import logging 
-
 from src.dataloader import DataLoader
 from src.solver import solve_lp
 from src.util import setup_logger

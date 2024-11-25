@@ -45,4 +45,4 @@ variables, A, B, L = dataloader.load()
 	- status: 문제를 풀었는지 (optimal / primal infeasible) 
 	- ...
 	- elased: 문제를 푸는데 걸린 시간(초)  
-- result_weight: linear programming으로 찾은 최적 X 벡터 
+- result_weight: linear programming으로 찾은 최적 X 벡터

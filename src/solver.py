@@ -11,7 +11,8 @@ solvers.options['glpk'] = {'msg_lev': 'GLP_MSG_OFF'} # glpk solver 로 풀 때 �
 def solve_lp(args: tuple[int, list]|list[int, list],
              L: matrix,
              A: matrix,
-             B: matrix):
+             B: matrix,
+             solver='glpk'):
     start = time.time()
     
     i, used_vars = args
@@ -20,7 +21,7 @@ def solve_lp(args: tuple[int, list]|list[int, list],
         used_const.append(j+3)
         used_const.append(j+3003)
     
-    opt = solvers.lp(L[used_vars], A[used_const, used_vars], B[used_const], solver='glpk')
+    opt = solvers.lp(L[used_vars], A[used_const, used_vars], B[used_const], solver=solver)
     end = time.time()
     
     opt['elapsed'] = end - start
