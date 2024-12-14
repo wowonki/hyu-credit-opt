@@ -1,4 +1,4 @@
-package service;
+package myutil;
 
 import javax.swing.*;
 import java.awt.*;
@@ -34,7 +34,7 @@ public class ScatterPlotSimple {
                 FontMetrics metrics = g2d.getFontMetrics();
                 String yLabel = "Return";
                 String xLabel = "Risk";
-                g2d.drawString(yLabel, padding / 2 - metrics.stringWidth(yLabel) / 2, getHeight() / 2); // Y축 레이블 (세로 배치)
+                g2d.drawString(yLabel, padding / 2 - metrics.stringWidth(yLabel) / 2, getHeight() / 2); // Y축 레이블
                 g2d.drawString(xLabel, getWidth() - padding - metrics.stringWidth(xLabel) / 2, getHeight() - padding + 30); // X축 레이블
 
                 // 데이터 범위 계산
@@ -46,7 +46,7 @@ public class ScatterPlotSimple {
                     yMin = Math.min(yMin, yData[i]);
                     yMax = Math.max(yMax, yData[i]);
                 }
-                
+
                 double xRange = xMax - xMin;
                 double yRange = yMax - yMin;
 
@@ -55,13 +55,24 @@ public class ScatterPlotSimple {
                 yMin -= 0.1 * yRange; // yMin에 10% 여유 추가
                 yMax += 0.1 * yRange; // yMax에 10% 여유 추가
 
-                // 그리드 그리기
+                // 그리드 및 값 표시
                 g2d.setColor(Color.LIGHT_GRAY);
                 for (int i = 0; i <= 10; i++) {
-                    int xGrid = padding + (int) ((xMax - xMin) * i / 10.0 * width / (xMax - xMin));
-                    int yGrid = getHeight() - padding - (int) ((yMax - yMin) * i / 10.0 * height / (yMax - yMin));
-                    g2d.drawLine(xGrid, getHeight() - padding, xGrid, padding); // X축 그리드
-                    g2d.drawLine(padding, yGrid, getWidth() - padding, yGrid); // Y축 그리드
+                    // X축 그리드 및 값
+                    int xGrid = padding + (int) ((i / 10.0) * width);
+                    double xValue = xMin + (i / 10.0) * (xMax - xMin);
+                    g2d.drawLine(xGrid, getHeight() - padding, xGrid, padding); // 그리드 선
+                    g2d.setColor(Color.BLACK);
+                    g2d.drawString(String.format("%.2f", xValue), xGrid - 15, getHeight() - padding + 20); // 값 표시
+                    g2d.setColor(Color.LIGHT_GRAY);
+
+                    // Y축 그리드 및 값
+                    int yGrid = getHeight() - padding - (int) ((i / 10.0) * height);
+                    double yValue = yMin + (i / 10.0) * (yMax - yMin);
+                    g2d.drawLine(padding, yGrid, getWidth() - padding, yGrid); // 그리드 선
+                    g2d.setColor(Color.BLACK);
+                    g2d.drawString(String.format("%.6f", yValue), padding - 50, yGrid + 5); // 값 표시
+                    g2d.setColor(Color.LIGHT_GRAY);
                 }
 
                 // 데이터 점 그리기

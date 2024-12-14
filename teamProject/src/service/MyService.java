@@ -3,6 +3,7 @@ package service;
 import myutil.HistogramPanel;
 import myutil.Maps;
 import myutil.Maps.StatusNode; // StatusNode 클래스 직접 사용
+import myutil.ScatterPlotSimple;
 
 import javax.swing.*;
 import java.util.*;
@@ -117,8 +118,13 @@ public class MyService {
 
         return values[1]; // 두 번째 값이 수익률
     }
-    
-    public float getProblemSolved() {
+
+    /**
+     *최적화가 완료된 문제의 비율(%)을 계산하여 반환합니다.
+     *
+     * @return 최적화된 문제의 비율(%) (소수점 포함)
+     */
+    public float getProblemSolvedPercentage() {
     	
     	float solved = 0;
     	float count = 0;
@@ -133,7 +139,10 @@ public class MyService {
     	result = (solved / count) * 100;
     	return result;
     }
-    
+
+    /**
+     *Efficient Frontier 을 시각화합니다.
+     */
     public void drawEfficientFrontier() {
     	
     	double[] xData = new double[maps.getValueMap().size()];
@@ -334,13 +343,14 @@ public class MyService {
 
         System.out.printf("문제 번호 %d에서 %d번째로 큰 가중치: %.10f%n", problemId, 3, service.FindTopKWeights(problemId, 3));
 
-        service.showHistogram(histogram);
+//        service.showHistogram(histogram);
 
         System.out.printf("총 걸린 시간: %.6f초%n", service.getTotalTime());
         System.out.printf("변수 %d를 포함한 문제들의 평균 소요 시간: %.6f초%n",variableIndex,service.getAverageTimeForVariable(variableIndex));
         System.out.printf("%.6f초 이내에 풀린 문제 번호: %s%n", maxTime, service.getProblemsSolvedWithinTime(maxTime));
         System.out.printf("문제 번호 %d의 수익률: %.6f%n", problemId, service.getProfitByProblemId(problemId));
-        System.out.printf("전체 문제 중 풀린 문제의 비율: %.6f(%%)%n", service.getProblemSolved());
+        System.out.printf("전체 문제 중 풀린 문제의 비율: %.6f(%%)%n", service.getProblemSolvedPercentage());
+
         service.drawEfficientFrontier();
     }
 }
