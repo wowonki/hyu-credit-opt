@@ -4,7 +4,7 @@ import java.io.*;
 import java.util.*;
 
 public class Maps {
-    private HashMap<Integer, double[]> weightMap = new HashMap<>();
+    private HashMap<Integer, Double[]> weightMap = new HashMap<>();
     private HashMap<Integer, StatusNode> statusMap = new HashMap<>();
     private HashMap<Integer, Double[]> valueMap = new HashMap<>(); // Placeholder for valueMap (구현 필요)
 
@@ -22,14 +22,14 @@ public class Maps {
             int problemNumber = 0;
 
             while ((line = br.readLine()) != null) {
-                String[] values = line.split(",");
-                double[] weights = new double[3000];
+                String[] weights = line.split(",");
+                Double[] weightarray = new Double[3000];
 
                 for (int i = 0; i < 3000; i++) {
-                    weights[i] = Double.parseDouble(values[i].trim());
+                    weightarray[i] = Double.parseDouble(weights[i].trim());
                 }
 
-                weightMap.put(problemNumber, weights);
+                weightMap.put(problemNumber, weightarray);
                 problemNumber++;
             }
         } catch (IOException e) {
@@ -60,11 +60,28 @@ public class Maps {
 
     // Value CSV 파일 읽기 (Placeholder, 구현 필요)
     public void loadValueCsv(String filePath) {
-        // valueMap 로직 추가 필요
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            int problemNumber = 0;
+
+            while ((line = br.readLine()) != null) {
+                String[] values = line.split(",");
+                Double[] valuearray = new Double[2];
+
+                for (int i = 0; i < 2; i++) {
+                    valuearray[i] = Double.parseDouble(values[i].trim());
+                }
+
+                weightMap.put(problemNumber, valuearray);
+                problemNumber++;
+            }
+        } catch (IOException e) {
+            System.err.println("Weight CSV 파일 읽기 중 오류 발생: " + e.getMessage());
+        }
     }
 
     // Getter 메서드
-    public HashMap<Integer, double[]> getWeightMap() {
+    public HashMap<Integer, Double[]> getWeightMap() {
         return weightMap;
     }
 
