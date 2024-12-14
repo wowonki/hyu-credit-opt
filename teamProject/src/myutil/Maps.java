@@ -26,7 +26,7 @@ public class Maps {
                 int problemNumber = Integer.parseInt(values[0].trim()); // 첫 번째 열이 problem 번호
                 Double[] weights = new Double[3000];
 
-                for (int i = 1; i <= 3000; i++) { // 두 번째 열부터 weight 값
+                for (int i = 1; i <= 3000; i++) { // 두 번째 열부터 weight 값 (null 은 -1 로 표현)
                     weights[i - 1] = Double.parseDouble(values[i].trim());
                 }
 
@@ -46,9 +46,9 @@ public class Maps {
             while ((line = br.readLine()) != null) {
                 String[] values = line.split(",");
                 int problemNumber = Integer.parseInt(values[0].trim()); // 첫 번째 열이 problem 번호
-                boolean optimality = Boolean.parseBoolean(values[1].trim());
-                double timeTaken = Double.parseDouble(values[2].trim());
-                int variableCount = (int) Double.parseDouble(values[3].trim());
+                boolean optimality = Boolean.parseBoolean(values[1].trim()); // optimal 여부
+                double timeTaken = Double.parseDouble(values[2].trim()); // 문제 푸는데 소요된 시간
+                int variableCount = (int) Double.parseDouble(values[3].trim()); // 문제의 변수 개수
 
                 StatusNode node = new StatusNode(optimality, timeTaken, variableCount);
                 statusMap.put(problemNumber, node);
