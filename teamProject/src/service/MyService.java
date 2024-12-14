@@ -117,6 +117,37 @@ public class MyService {
 
         return values[1]; // 두 번째 값이 수익률
     }
+    
+    public float getProblemSolved() {
+    	
+    	float solved = 0;
+    	float count = 0;
+    	float result;
+    	for (Map.Entry<Integer, StatusNode> entry : maps.getStatusMap().entrySet()) {
+    		
+    		if (entry.getValue().isOptimality()) {
+    			solved ++;
+    		}
+    		count++;
+    	}
+    	result = (solved / count) * 100;
+    	return result;
+    }
+    
+    public void drawEfficientFrontier() {
+    	
+    	double[] xData = new double[maps.getValueMap().size()];
+        double[] yData = new double[maps.getValueMap().size()];
+
+        int index = 0;
+        for (Map.Entry<Integer, Double[]> entry : maps.getValueMap().entrySet()) {
+            xData[index] = -entry.getValue()[0]; // risk
+            yData[index] = entry.getValue()[1]; // return
+            index++;
+        }
+    	
+    	ScatterPlotSimple.drawScatterPlot(xData, yData, "Sample Scatter Plot");
+    }
 
     /**
      * valueMap에서 정렬된 수익률 리스트를 반환합니다.
@@ -305,5 +336,11 @@ public class MyService {
 
         service.showHistogram(histogram);
 
+        System.out.printf("총 걸린 시간: %.6f초%n", service.getTotalTime());
+        System.out.printf("변수 %d를 포함한 문제들의 평균 소요 시간: %.6f초%n",variableIndex,service.getAverageTimeForVariable(variableIndex));
+        System.out.printf("%.6f초 이내에 풀린 문제 번호: %s%n", maxTime, service.getProblemsSolvedWithinTime(maxTime));
+        System.out.printf("문제 번호 %d의 수익률: %.6f%n", problemId, service.getProfitByProblemId(problemId));
+        System.out.printf("전체 문제 중 풀린 문제의 비율: %.6f(%%)%n", service.getProblemSolved());
+        service.drawEfficientFrontier();
     }
 }
