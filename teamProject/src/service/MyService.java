@@ -189,22 +189,52 @@ public class MyService {
     }
 
     /**
-     * 정렬된 수익률 리스트를 기반으로 지정된 분위 개수로 나누어 평균을 계산합니다.
+     * valueMap에서 정렬된 위험 리스트를 반환합니다.
      *
-     * @param sortedProfits 정렬된 수익률 리스트
+     * @return 정렬된 위험 리스트
+     */
+    public List<Double> getSortedRisks() {
+        TreeMap<Double, Integer> riskFrequency = new TreeMap<>(); // 수익률 -> 빈도수
+
+        // valueMap에서 위험 데이터를 TreeMap에 추가
+        for (Map.Entry<Integer, Double[]> entry : maps.getValueMap().entrySet()) {
+            Double[] values = entry.getValue();
+            if (values != null && values.length >= 2) {
+                double risk = values[0]; // 위험
+                riskFrequency.put(risk, riskFrequency.getOrDefault(risk, 0) + 1);
+            }
+        }
+
+        // TreeMap에서 정렬된 위험 데이터를 리스트로 변환
+        List<Double> risks = new ArrayList<>();
+        for (Map.Entry<Double, Integer> entry : riskFrequency.entrySet()) {
+            double profit = entry.getKey();
+            int frequency = entry.getValue();
+            for (int i = 0; i < frequency; i++) {
+                risks.add(profit);
+            }
+        }
+
+        return risks;
+    }
+
+    /**
+     * 정렬된 리스트를 기반으로 지정된 분위 개수로 나누어 평균을 계산합니다.
+     *
+     * @param sortedList 정렬된 수익률 리스트
      * @param divisions 분위 개수 (예: 10, 20 등)
      * @return 분위별 평균 수익률 리스트
      */
-    public List<Double> calculateAveragesFromSortedList(List<Double> sortedProfits, int divisions) {
+    public List<Double> calculateAveragesFromSortedList(List<Double> sortedList, int divisions) {
         List<Double> averages = new ArrayList<>();
-        int total = sortedProfits.size();
+        int total = sortedList.size();
         int chunkSize = total / divisions; // 한 분위의 데이터 개수
 
         for (int i = 0; i < divisions; i++) {
             int start = i * chunkSize;
             int end = (i == divisions - 1) ? total : start + chunkSize; // 마지막 분위는 남은 데이터 포함
 
-            List<Double> quantile = sortedProfits.subList(start, end);
+            List<Double> quantile = sortedList.subList(start, end);
             averages.add(calculateAverage(quantile));
         }
 
@@ -228,18 +258,18 @@ public class MyService {
     }
 
     /**
-     * 정렬된 수익률 리스트를 기반으로 분위별 범위를 나누고, 각 범위에 속하는 데이터의 개수를 계산합니다.
+     * 정렬된 리스트를 기반으로 분위별 범위를 나누고, 각 범위에 속하는 데이터의 개수를 계산합니다.
      *
-     * @param sortedProfits 정렬된 수익률 리스트
+     * @param sortedList 정렬된 리스트
      * @param quantile 분위 개수 (예: 10, 20 등)
      * @return 분위별 데이터 배열 (각 분위의 lowerBound, upperBound, count를 포함)
      */
-    public List<double[]> generateHistogram(List<Double> sortedProfits, int quantile) {
+    public List<double[]> generateHistogram(List<Double> sortedList, int quantile) {
         List<double[]> histogram = new ArrayList<>();
 
         // 리스트의 최소값과 최대값
-        double minProfit = sortedProfits.get(0);
-        double maxProfit = sortedProfits.get(sortedProfits.size() - 1);
+        double minProfit = sortedList.get(0);
+        double maxProfit = sortedList.get(sortedList.size() - 1);
 
         // 각 분위의 범위 크기
         double range = (maxProfit - minProfit) / quantile;
@@ -252,7 +282,7 @@ public class MyService {
         }
 
         // 각 데이터가 속한 분위의 개수 증가
-        for (double profit : sortedProfits) {
+        for (double profit : sortedList) {
             int index = (int) ((profit - minProfit) / range);
             if (index >= quantile) index = quantile - 1; // 마지막 범위 처리
             histogram.get(index)[2]++;
@@ -326,6 +356,9 @@ public class MyService {
         // sort 수익률
         List<Double> sortedprofits = service.getSortedProfits();
 
+        // sort 위험
+        List<Double> sortedrisks = service.getSortedRisks();
+
         // 10분위 평균 수익률 계산
 //        List<Double> decileAverages = service.calculateAveragesFromSortedList(sortedprofits, 10);
 //        System.out.println("10분위별 평균 수익률:");
@@ -333,24 +366,32 @@ public class MyService {
 //            System.out.printf("하위 %d%% ~ %d%%: %.4f%n", i * 10, (i + 1) * 10, decileAverages.get(i));
 //        }
 
-        //히스토그램
-        List<double[]> histogram = service.generateHistogram(sortedprofits, 20);
+        //수익률 히스토그램
+        List<double[]> histogram_return = service.generateHistogram(sortedprofits, 20);
         System.out.printf("%d분위별 데이터:%n", 20);
-        for (int i = 0; i < histogram.size(); i++) {
-            double[] data = histogram.get(i);
+        for (int i = 0; i < histogram_return.size(); i++) {
+            double[] data = histogram_return.get(i);
             System.out.printf("분위 %d: %.6f ~ %.6f (개수: %d)%n", i + 1, data[0], data[1], (int) data[2]);
         }
 
-        System.out.printf("문제 번호 %d에서 %d번째로 큰 가중치: %.10f%n", problemId, 3, service.FindTopKWeights(problemId, 3));
+        //위험 히스토그램
+        List<double[]> histogram_risk = service.generateHistogram(sortedrisks, 20);
+        System.out.printf("%d분위별 데이터:%n", 20);
+        for (int i = 0; i < histogram_risk.size(); i++) {
+            double[] data = histogram_risk.get(i);
+            System.out.printf("분위 %d: %.6f ~ %.6f (개수: %d)%n", i + 1, data[0], data[1], (int) data[2]);
+        }
 
-//        service.showHistogram(histogram);
+//        service.showHistogram(histogram_return);
+        service.showHistogram(histogram_risk);
 
         System.out.printf("총 걸린 시간: %.6f초%n", service.getTotalTime());
         System.out.printf("변수 %d를 포함한 문제들의 평균 소요 시간: %.6f초%n",variableIndex,service.getAverageTimeForVariable(variableIndex));
         System.out.printf("%.6f초 이내에 풀린 문제 번호: %s%n", maxTime, service.getProblemsSolvedWithinTime(maxTime));
         System.out.printf("문제 번호 %d의 수익률: %.6f%n", problemId, service.getProfitByProblemId(problemId));
         System.out.printf("전체 문제 중 풀린 문제의 비율: %.6f(%%)%n", service.getProblemSolvedPercentage());
+        System.out.printf("문제 번호 %d에서 %d번째로 큰 가중치: %.10f%n", problemId, 3, service.FindTopKWeights(problemId, 3));
 
-        service.drawEfficientFrontier();
+//        service.drawEfficientFrontier();
     }
 }
