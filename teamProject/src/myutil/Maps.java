@@ -6,31 +6,31 @@ import java.util.*;
 public class Maps {
     private HashMap<Integer, Double[]> weightMap = new HashMap<>();
     private HashMap<Integer, StatusNode> statusMap = new HashMap<>();
-    private HashMap<Integer, Double[]> valueMap = new HashMap<>(); // Placeholder for valueMap (구현 필요)
+    private HashMap<Integer, Double[]> valueMap = new HashMap<>();
 
     // 생성자: 파일 경로를 받아 자동으로 Map 구성
     public Maps(String weightFilePath, String statusFilePath, String valueFilePath) {
         loadWeightCsv(weightFilePath);  // weightMap 구성
         loadStatusCsv(statusFilePath); // statusMap 구성
-        loadValueCsv(valueFilePath);   // valueMap 구성 (추가 구현 필요)
+        loadValueCsv(valueFilePath);   // valueMap 구성
     }
 
     // Weight CSV 파일 읽기
     public void loadWeightCsv(String filePath) {
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
-            int problemNumber = 0;
+            br.readLine(); // 헤더 스킵
 
             while ((line = br.readLine()) != null) {
-                String[] weights = line.split(",");
-                Double[] weightarray = new Double[3000];
+                String[] values = line.split(",");
+                int problemNumber = Integer.parseInt(values[0].trim()); // 첫 번째 열이 problem 번호
+                Double[] weights = new Double[3000];
 
-                for (int i = 0; i < 3000; i++) {
-                    weightarray[i] = Double.parseDouble(weights[i].trim());
+                for (int i = 1; i <= 3000; i++) { // 두 번째 열부터 weight 값
+                    weights[i - 1] = Double.parseDouble(values[i].trim());
                 }
 
-                weightMap.put(problemNumber, weightarray);
-                problemNumber++;
+                weightMap.put(problemNumber, weights);
             }
         } catch (IOException e) {
             System.err.println("Weight CSV 파일 읽기 중 오류 발생: " + e.getMessage());
@@ -45,10 +45,10 @@ public class Maps {
 
             while ((line = br.readLine()) != null) {
                 String[] values = line.split(",");
-                int problemNumber = Integer.parseInt(values[0]);
-                boolean optimality = Boolean.parseBoolean(values[1]);
-                double timeTaken = Double.parseDouble(values[2]);
-                int variableCount = Integer.parseInt(values[3]);
+                int problemNumber = Integer.parseInt(values[0].trim()); // 첫 번째 열이 problem 번호
+                boolean optimality = Boolean.parseBoolean(values[1].trim());
+                double timeTaken = Double.parseDouble(values[2].trim());
+                int variableCount = Integer.parseInt(values[3].trim());
 
                 StatusNode node = new StatusNode(optimality, timeTaken, variableCount);
                 statusMap.put(problemNumber, node);
@@ -58,25 +58,25 @@ public class Maps {
         }
     }
 
-    // Value CSV 파일 읽기 (Placeholder, 구현 필요)
+    // Value CSV 파일 읽기
     public void loadValueCsv(String filePath) {
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
-            int problemNumber = 0;
+            br.readLine(); // 헤더 스킵
 
             while ((line = br.readLine()) != null) {
                 String[] values = line.split(",");
-                Double[] valuearray = new Double[2];
+                int problemNumber = Integer.parseInt(values[0].trim()); // 첫 번째 열이 problem 번호
+                Double[] valueArray = new Double[2];
 
-                for (int i = 0; i < 2; i++) {
-                    valuearray[i] = Double.parseDouble(values[i].trim());
+                for (int i = 1; i <= 2; i++) { // 두 번째 열부터 risk, return 값
+                    valueArray[i - 1] = Double.parseDouble(values[i].trim());
                 }
 
-                weightMap.put(problemNumber, valuearray);
-                problemNumber++;
+                valueMap.put(problemNumber, valueArray);
             }
         } catch (IOException e) {
-            System.err.println("Weight CSV 파일 읽기 중 오류 발생: " + e.getMessage());
+            System.err.println("Value CSV 파일 읽기 중 오류 발생: " + e.getMessage());
         }
     }
 
