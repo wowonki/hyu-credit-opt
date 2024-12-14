@@ -46,7 +46,7 @@ public class Maps {
             while ((line = br.readLine()) != null) {
                 String[] values = line.split(",");
                 int problemNumber = Integer.parseInt(values[0].trim()); // 첫 번째 열이 problem 번호
-                boolean optimality = Boolean.parseBoolean(values[1].trim()); // optimal 여부
+                boolean optimality = "optimal".equals(values[1].trim()); // optimal 여부
                 double timeTaken = Double.parseDouble(values[2].trim()); // 문제 푸는데 소요된 시간
                 int variableCount = (int) Double.parseDouble(values[3].trim()); // 문제의 변수 개수
 
