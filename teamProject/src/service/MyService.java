@@ -5,10 +5,7 @@ import myutil.Maps;
 import myutil.Maps.StatusNode; // StatusNode 클래스 직접 사용
 
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 public class MyService {
 
@@ -224,6 +221,11 @@ public class MyService {
         return histogram;
     }
 
+    /**
+     * 히스토그램을 swing을 통해 시각화합니다.
+     *
+     * @param histogram
+     */
     public void showHistogram(List<double[]> histogram) {
         JFrame frame = new JFrame("Histogram");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -235,11 +237,47 @@ public class MyService {
         frame.setVisible(true);
     }
 
+    /**
+     * 주어진 문제 ID에 대해 k번째로 큰 가중치를 반환합니다.
+     *
+     * 이 메서드는 특정 문제 ID에 해당하는 가중치 배열에서 k번째로 큰 값을 찾습니다.
+     * 가중치 배열은 null 값이나 음수 값을 제외하고, 내림차순으로 정렬하여 상위 k번째 값을 반환합니다.
+     *
+     * @param problemId 문제 번호
+     * @param k 상위 k번째 값을 찾기 위한 정수 (1 이상이어야 함)
+     * @return k번째로 큰 가중치 값 (Double), 유효한 값이 없는 경우 null 반환
+     */
+    public Double FindTopKWeights(int problemId, int k) {
+        Double[] weights = maps.getWeightMap().get(problemId);
+
+        if (weights == null || weights.length == 0 || k <= 0) {
+            return null; // 유효하지 않은 경우
+        }
+
+        TreeMap<Double, Integer> weightMap = new TreeMap<>(Collections.reverseOrder());
+        for (Double weight : weights) {
+            if (weight != null && weight >0) {
+                weightMap.put(weight, weightMap.getOrDefault(weight, 0) + 1);
+            }
+        }
+
+        int count = 0;
+        for (Map.Entry<Double, Integer> entry : weightMap.entrySet()) {
+            count += entry.getValue();
+            if (count >= k) {
+                return entry.getKey();
+            }
+        }
+
+        return null; // k번째로 큰 값이 없는 경우
+    }
+
+
     public static void main(String[] args) {
         MyService service = new MyService();
-//        int variableIndex = 10;
-//        int problemId = 5;
-//        double maxTime = 0.01d;
+        int variableIndex = 10;
+        int problemId = 5;
+        double maxTime = 0.01d;
 //        System.out.printf("총 걸린 시간: %.2f초%n", service.getTotalTime());
 //        System.out.printf("변수 %d를 포함한 문제들의 평균 소요 시간: %.6f초%n",variableIndex,service.getAverageTimeForVariable(variableIndex));
 //        System.out.printf("%.6f초 이내에 풀린 문제 번호: %s%n", maxTime, service.getProblemsSolvedWithinTime(maxTime));
@@ -262,6 +300,8 @@ public class MyService {
             double[] data = histogram.get(i);
             System.out.printf("분위 %d: %.6f ~ %.6f (개수: %d)%n", i + 1, data[0], data[1], (int) data[2]);
         }
+
+        System.out.printf("문제 번호 %d에서 %d번째로 큰 가중치: %.10f%n", problemId, 3, service.FindTopKWeights(problemId, 3));
 
         service.showHistogram(histogram);
 
