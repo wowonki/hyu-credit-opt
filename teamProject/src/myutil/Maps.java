@@ -19,6 +19,7 @@ public class Maps {
     public void loadWeightCsv(String filePath) {
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
+            br.readLine(); // 헤더 스킵
 
             while ((line = br.readLine()) != null) {
                 String[] values = line.split(",");
@@ -47,7 +48,7 @@ public class Maps {
                 int problemNumber = Integer.parseInt(values[0].trim()); // 첫 번째 열이 problem 번호
                 boolean optimality = Boolean.parseBoolean(values[1].trim());
                 double timeTaken = Double.parseDouble(values[2].trim());
-                int variableCount = Integer.parseInt(values[3].trim());
+                int variableCount = (int) Double.parseDouble(values[3].trim());
 
                 StatusNode node = new StatusNode(optimality, timeTaken, variableCount);
                 statusMap.put(problemNumber, node);
@@ -93,7 +94,7 @@ public class Maps {
     }
 
     // 내부 클래스: StatusNode
-    class StatusNode {
+    public class StatusNode {
         private boolean optimality;
         private double timeTaken;
         private int variableCount;
