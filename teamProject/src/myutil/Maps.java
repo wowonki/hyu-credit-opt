@@ -19,7 +19,6 @@ public class Maps {
     public void loadWeightCsv(String filePath) {
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
-            br.readLine(); // 헤더 스킵
 
             while ((line = br.readLine()) != null) {
                 String[] values = line.split(",");
