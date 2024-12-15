@@ -10,7 +10,7 @@ public class Maps {
 
     // 생성자: 파일 경로를 받아 자동으로 Map 구성
     public Maps(String weightFilePath, String statusFilePath, String valueFilePath) {
-//        loadWeightCsv(weightFilePath);  // weightMap 구성
+        loadWeightCsv(weightFilePath);  // weightMap 구성
         loadStatusCsv(statusFilePath); // statusMap 구성
         loadValueCsv(valueFilePath);   // valueMap 구성
     }

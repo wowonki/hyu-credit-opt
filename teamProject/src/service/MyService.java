@@ -217,6 +217,32 @@ public class MyService {
 
         return risks;
     }
+    
+    /**
+     * 상위 K 개의 수익률을 가지는 리스트를 반환
+     * 
+     * @param k
+     * @return
+     */
+    public List<Double> findTopKReturn(int k) { 
+    	List<Double> sortedList = getSortedProfits();
+    	List<Double> result = new ArrayList<>();
+
+    	for (int i=0;i < k;i++) {
+    		result.add(sortedList.get(i));
+    	}
+    	return result;
+    }
+    
+    public List<Double> findBottomKRisk(int k) { 
+    	List<Double> sortedList = getSortedRisks();
+    	List<Double> result = new ArrayList<>();
+
+    	for (int i=0;i < k;i++) {
+    		result.add(sortedList.get(i));
+    	}
+    	return result;
+    }
 
     /**
      * 정렬된 리스트를 기반으로 지정된 분위 개수로 나누어 평균을 계산합니다.
