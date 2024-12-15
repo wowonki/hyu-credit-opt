@@ -302,8 +302,8 @@ public class MyService {
         frame.setSize(800, 600);
 
         HistogramPanel panel = new HistogramPanel(histogram);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // 창만 닫기
         frame.add(panel);
-
         frame.setVisible(true);
     }
 
@@ -348,23 +348,11 @@ public class MyService {
         int variableIndex = 10;
         int problemId = 5;
         double maxTime = 0.01d;
-//        System.out.printf("총 걸린 시간: %.2f초%n", service.getTotalTime());
-//        System.out.printf("변수 %d를 포함한 문제들의 평균 소요 시간: %.6f초%n",variableIndex,service.getAverageTimeForVariable(variableIndex));
-//        System.out.printf("%.6f초 이내에 풀린 문제 번호: %s%n", maxTime, service.getProblemsSolvedWithinTime(maxTime));
-//        System.out.printf("문제 번호 %d의 수익률: %.2f%n", problemId, service.getProfitByProblemId(problemId));
-
         // sort 수익률
         List<Double> sortedprofits = service.getSortedProfits();
 
         // sort 위험
         List<Double> sortedrisks = service.getSortedRisks();
-
-        // 10분위 평균 수익률 계산
-//        List<Double> decileAverages = service.calculateAveragesFromSortedList(sortedprofits, 10);
-//        System.out.println("10분위별 평균 수익률:");
-//        for (int i = 0; i < decileAverages.size(); i++) {
-//            System.out.printf("하위 %d%% ~ %d%%: %.4f%n", i * 10, (i + 1) * 10, decileAverages.get(i));
-//        }
 
         //수익률 히스토그램
         List<double[]> histogram_return = service.generateHistogram(sortedprofits, 20);
@@ -382,7 +370,7 @@ public class MyService {
             System.out.printf("분위 %d: %.6f ~ %.6f (개수: %d)%n", i + 1, data[0], data[1], (int) data[2]);
         }
 
-//        service.showHistogram(histogram_return);
+        service.showHistogram(histogram_return);
         service.showHistogram(histogram_risk);
 
         System.out.printf("총 걸린 시간: %.6f초%n", service.getTotalTime());
@@ -392,6 +380,6 @@ public class MyService {
         System.out.printf("전체 문제 중 풀린 문제의 비율: %.6f(%%)%n", service.getProblemSolvedPercentage());
         System.out.printf("문제 번호 %d에서 %d번째로 큰 가중치: %.10f%n", problemId, 3, service.FindTopKWeights(problemId, 3));
 
-//        service.drawEfficientFrontier();
+        service.drawEfficientFrontier();
     }
 }
