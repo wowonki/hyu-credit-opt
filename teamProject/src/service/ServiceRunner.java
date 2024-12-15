@@ -19,7 +19,7 @@ public class ServiceRunner {
             System.out.println("\n-------- 포트폴리오 성과 관련 --------");
             System.out.println("21. 특정 문제의 수익률 확인하기");
             System.out.println("22. K개의 높은 수익률 포트폴리오 보기");
-            System.out.println("23. K개의 안전한 포트폴리오 Risk 확인하기");
+            System.out.println("23. K개의 안전한 포트폴리오 보기");
             System.out.println("24. Return 히스토그램 그리기");
             System.out.println("25. Risk 히스토그램 그리기");
             System.out.println("26. 효율적 투자선 그리기");
@@ -55,12 +55,16 @@ public class ServiceRunner {
                 case 22:
                     System.out.print("K 입력: ");
                     K = scanner.nextInt();
-                    System.out.println("높은 Return의 K개의 포트폴리오: " + service.findTopKReturn(K));
+                    TreeMap<Double, Integer[]> lowestRisk = service.getTreeMapSortedByProfitGroupedByProblemId();
+                    List<Integer> topNRisk = service.getTopNProblemsBySortedTreeMap(lowestRisk, K);
+                    System.out.println("높은 Return의 K개의 포트폴리오: " + topNRisk);
                     break;
                 case 23:
                     System.out.print("K 입력: ");
                     K = scanner.nextInt();
-                    System.out.println("낮은 Risk의 K개 포트폴리오: " + service.findBottomKRisk(K));
+                    TreeMap<Double, Integer[]> highestReturn = service.getTreeMapSortedByRiskGroupedByProblemId();
+                    List<Integer> topNReturn = service.getTopNProblemsBySortedTreeMap(highestReturn, K);
+                    System.out.println("낮은 Risk의 K개 포트폴리오: " + topNReturn);
                     break;
                 case 24:
                     List<double[]> hist1 = service.generateHistogram(service.getSortedProfits(), 20);

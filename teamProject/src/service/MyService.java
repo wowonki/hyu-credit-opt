@@ -217,31 +217,129 @@ public class MyService {
 
         return risks;
     }
-    
+
     /**
-     * 상위 K 개의 수익률을 가지는 리스트를 반환
-     * 
-     * @param k
-     * @return
+     * valueMap에서 수익률 값을 기준으로 정렬된 TreeMap을 반환합니다. (내림차순)
+     * 동일한 수익률 값을 가진 문제 번호들은 Integer[]에 저장됩니다.
+     *
+     * @return 수익률 값을 기준으로 정렬된 TreeMap (key = 수익률, value = 문제 번호 배열)
      */
-    public List<Double> findTopKReturn(int k) { 
-    	List<Double> sortedList = getSortedProfits();
-    	List<Double> result = new ArrayList<>();
+    public TreeMap<Double, Integer[]> getTreeMapSortedByProfitGroupedByProblemId() {
+        TreeMap<Double, List<Integer>> tempTreeMap = new TreeMap<>(Collections.reverseOrder()); // 임시 TreeMap (List로 관리)
 
-    	for (int i=0;i < k;i++) {
-    		result.add(sortedList.get(i));
-    	}
-    	return result;
+        // valueMap 데이터를 순회하며 수익률 기준으로 TreeMap에 데이터 추가
+        for (Map.Entry<Integer, Double[]> entry : maps.getValueMap().entrySet()) {
+            Double[] values = entry.getValue();
+            if (values != null && values.length >= 2) {
+                double profit = values[1]; // 수익률 값
+                int problemId = entry.getKey(); // 문제 번호
+
+                // 동일한 수익률에 대해 문제 번호를 List에 추가
+                tempTreeMap.putIfAbsent(profit, new ArrayList<>());
+                tempTreeMap.get(profit).add(problemId);
+            }
+        }
+
+        // List<Integer>를 Integer[]로 변환하여 최종 TreeMap 생성
+        TreeMap<Double, Integer[]> sortedTreeMap = new TreeMap<>();
+        for (Map.Entry<Double, List<Integer>> entry : tempTreeMap.entrySet()) {
+            Double profit = entry.getKey();
+            List<Integer> problemIds = entry.getValue();
+            sortedTreeMap.put(profit, problemIds.toArray(new Integer[0]));
+        }
+
+        return sortedTreeMap;
     }
-    
-    public List<Double> findBottomKRisk(int k) { 
-    	List<Double> sortedList = getSortedRisks();
-    	List<Double> result = new ArrayList<>();
 
-    	for (int i=0;i < k;i++) {
-    		result.add(sortedList.get(i));
-    	}
-    	return result;
+    /**
+     * valueMap에서 위험 값을 기준으로 정렬된 TreeMap을 반환합니다. (오름차순)
+     * 동일한 위험 값을 가진 문제 번호들은 Integer[]에 저장됩니다.
+     *
+     * @return 위험 값을 기준으로 정렬된 TreeMap (key = 위험, value = 문제 번호 배열)
+     */
+    public TreeMap<Double, Integer[]> getTreeMapSortedByRiskGroupedByProblemId() {
+        TreeMap<Double, List<Integer>> tempTreeMap = new TreeMap<>(); // 임시 TreeMap (List로 관리)
+
+        // valueMap 데이터를 순회하며 위험 기준으로 TreeMap에 데이터 추가
+        for (Map.Entry<Integer, Double[]> entry : maps.getValueMap().entrySet()) {
+            Double[] values = entry.getValue();
+            if (values != null && values.length >= 2) {
+                double risk = values[0]; // 위험 값
+                int problemId = entry.getKey(); // 문제 번호
+
+                // 동일한 위험에 대해 문제 번호를 List에 추가
+                tempTreeMap.putIfAbsent(risk, new ArrayList<>());
+                tempTreeMap.get(risk).add(problemId);
+            }
+        }
+
+        // List<Integer>를 Integer[]로 변환하여 최종 TreeMap 생성
+        TreeMap<Double, Integer[]> sortedTreeMap = new TreeMap<>();
+        for (Map.Entry<Double, List<Integer>> entry : tempTreeMap.entrySet()) {
+            Double risk = entry.getKey();
+            List<Integer> problemIds = entry.getValue();
+            sortedTreeMap.put(risk, problemIds.toArray(new Integer[0]));
+        }
+
+        return sortedTreeMap;
+    }
+
+    /**
+     * 위험 값이 가장 낮은 (수익률이 가장 높은) 상위 문제 번호를 가져옵니다.
+     * 중복 위험 값이 포함된 경우에도 상위 문제 번호들을 모두 반환합니다.
+     *
+     * @param SortedMap 값을 기준으로 정렬된 TreeMap (key = 위험, value = 문제 번호 배열) (위험: 내림차순, 수익: 오름차순)
+     * @param topN 가져올 상위 문제 개수
+     * @return 상위 문제 번호 리스트
+     */
+    public List<Integer> getTopNProblemsBySortedTreeMap(TreeMap<Double, Integer[]> SortedMap, int topN) {
+        List<Integer> result = new ArrayList<>();
+        int count = 0;
+
+        // 순회
+        for (Map.Entry<Double, Integer[]> entry : SortedMap.entrySet()) {
+            Integer[] problemIds = entry.getValue();
+
+            // 문제 번호를 결과 리스트에 추가
+            result.addAll(Arrays.asList(problemIds));
+            count += problemIds.length;
+
+            // 상위 N개 문제를 초과하면 루프 종료
+            if (count >= topN) {
+                break;
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * 수익률이 가장 높은 topN개의 문제 번호를 반환합니다.
+     * 동일한 수익률 값이 포함된 경우에도 모든 문제 번호를 반환합니다.
+     *
+     * @param profitMap 수익률 값을 기준으로 정렬된 TreeMap (key = 수익률, value = 문제 번호 배열)
+     * @param topN 가져올 상위 문제 개수
+     * @return 상위 문제 번호 리스트
+     */
+    public List<Integer> getTopNProblemsByHighestProfit(TreeMap<Double, Integer[]> profitMap, int topN) {
+        List<Integer> result = new ArrayList<>();
+        int count = 0;
+
+        // 수익률이 높은 순서로 순회 (내림차순)
+        for (Map.Entry<Double, Integer[]> entry : profitMap.descendingMap().entrySet()) {
+            Integer[] problemIds = entry.getValue();
+
+            // 문제 번호를 결과 리스트에 추가
+            result.addAll(Arrays.asList(problemIds));
+            count += problemIds.length;
+
+            // 상위 N개 문제를 초과하면 루프 종료
+            if (count >= topN) {
+                break;
+            }
+        }
+
+        return result;
     }
 
     /**
